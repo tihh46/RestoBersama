@@ -1,0 +1,374 @@
+```react
+import React, { useState } from 'react';
+import { 
+  ChevronRight, Plus, Minus, ShoppingCart, 
+  ArrowLeft, QrCode, Utensils, Star, 
+  CheckCircle2, Heart, Scan, Info, Wallet
+} from 'lucide-react';
+
+const App = () => {
+  const [step, setStep] = useState(1); // 1: Welcome, 2: Menu, 3: Payment, 4: Rating
+  const [tableNumber, setTableNumber] = useState('');
+  const [cart, setCart] = useState({});
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const menuItems = [
+    // MAKANAN
+    { 
+      id: 'ngs', name: 'Nasi Goreng Special', price: 25000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=300&q=80',
+      description: 'Nasi goreng bumbu rempah dengan telur dan ayam suwir.' 
+    },
+    { 
+      id: 'ngf', name: 'Nasi Goreng Seafood', price: 32000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1512058560366-cd24270083cd?auto=format&fit=crop&w=300&q=80',
+      description: 'Nasi goreng gurih dengan udang segar dan cumi.' 
+    },
+    { 
+      id: 'bks', name: 'Bakso Urat Granat', price: 22000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1593444210874-8b1e8e19e933?auto=format&fit=crop&w=300&q=80',
+      description: 'Bakso urat sapi asli dengan kuah kaldu yang gurih.' 
+    },
+    { 
+      id: 'may', name: 'Mie Ayam Pangsit', price: 18000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=300&q=80',
+      description: 'Mie kenyal dengan topping ayam bumbu manis dan pangsit.' 
+    },
+    { 
+      id: 'pza', name: 'Pizza Margherita', price: 45000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=300&q=80',
+      description: 'Pizza tipis renyah dengan saus tomat dan keju mozarella.' 
+    },
+    { 
+      id: 'bgr', name: 'Classic Beef Burger', price: 35000, category: 'Makanan', 
+      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80',
+      description: 'Daging sapi panggang juicy dengan sayuran segar.' 
+    },
+    // MINUMAN
+    { 
+      id: 'etm', name: 'Es Teh Manis', price: 5000, category: 'Minuman', 
+      image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80',
+      description: 'Teh pilihan yang diseduh segar dengan es batu.' 
+    },
+    { 
+      id: 'esj', name: 'Es Jeruk Peras', price: 10000, category: 'Minuman', 
+      image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=300&q=80',
+      description: 'Jeruk peras murni kaya vitamin C.' 
+    },
+    { 
+      id: 'esc', name: 'Es Campur Segar', price: 15000, category: 'Minuman', 
+      image: 'https://images.unsplash.com/photo-1626078299034-9694e998782d?auto=format&fit=crop&w=300&q=80',
+      description: 'Aneka buah, jelly, dan sirup dengan serutan es.' 
+    },
+    { 
+      id: 'esl', name: 'Es Kelapa Muda', price: 12000, category: 'Minuman', 
+      image: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=300&q=80',
+      description: 'Air kelapa asli dan daging kelapa muda segar.' 
+    },
+    { 
+      id: 'esk', name: 'Es Kopi Susu', price: 18000, category: 'Minuman', 
+      image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=300&q=80',
+      description: 'Kopi robusta pilihan dengan susu kental manis.' 
+    },
+  ];
+
+  const addToCart = (id) => {
+    setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  };
+
+  const removeFromCart = (id) => {
+    if (cart[id] > 0) {
+      setCart(prev => ({ ...prev, [id]: prev[id] - 1 }));
+    }
+  };
+
+  const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
+  const totalPrice = menuItems.reduce((acc, item) => acc + (item.price * (cart[item.id] || 0)), 0);
+
+  const colors = {
+    bg: 'bg-[#F7F4EF]', 
+    accent: 'bg-[#C7A17A]', 
+    text: '#4E453C', 
+    button: 'bg-[#8D6D53]',
+    card: 'bg-white/95'
+  };
+
+  // 1. Halaman Selamat Datang
+  const WelcomeScreen = () => (
+    <div className={`flex flex-col items-center justify-center min-h-screen p-8 ${colors.bg} relative`}>
+      <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-[#EAE4D7] to-transparent opacity-50" />
+      <div className="z-10 w-full max-w-sm flex flex-col items-center text-center">
+        <div className={`p-6 rounded-full ${colors.button} text-white mb-6 shadow-2xl ring-8 ring-white/20`}>
+          <Utensils size={44} />
+        </div>
+        <h1 className="text-4xl font-serif font-black mb-2 text-[#4E453C]">Resto Bersama</h1>
+        <p className="mb-12 italic opacity-70 text-[#4E453C]">Nikmati Hidangan Spesial Kami</p>
+        
+        <div className="w-full bg-white/70 backdrop-blur-md p-8 rounded-[3.5rem] shadow-xl border border-white">
+          <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-4">Silahkan Masukkan Nomor Meja</p>
+          <input 
+            type="number" 
+            placeholder="--" 
+            className="w-full p-4 rounded-3xl border-none ring-2 ring-[#C7A17A]/20 focus:ring-[#C7A17A] text-center text-6xl font-black bg-white mb-10 text-[#8D6D53] outline-none"
+            value={tableNumber}
+            onChange={(e) => setTableNumber(e.target.value)}
+          />
+          <button 
+            onClick={() => tableNumber && setStep(2)}
+            disabled={!tableNumber}
+            className={`w-full py-5 rounded-3xl text-white font-black text-xl flex items-center justify-center gap-3 transition-all transform active:scale-95 shadow-lg ${tableNumber ? colors.button : 'bg-gray-300 cursor-not-allowed'}`}
+          >
+            Pesan Menu <ChevronRight size={24} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 2. Halaman Menu
+  const MenuScreen = () => {
+    const categories = ['Makanan', 'Minuman'];
+    return (
+      <div className={`min-h-screen pb-44 ${colors.bg}`}>
+        <header className="px-6 py-8 sticky top-0 bg-[#F7F4EF]/90 backdrop-blur-lg z-20 flex justify-between items-center border-b border-[#C7A17A]/10">
+          <div>
+            <h2 className="text-xl font-black text-[#4E453C]">Resto Bersama</h2>
+            <p className="text-[10px] font-bold text-[#C7A17A] uppercase tracking-widest">Meja {tableNumber}</p>
+          </div>
+          <div className={`p-3 rounded-2xl ${colors.accent} text-white relative shadow-lg`}>
+            <ShoppingCart size={22} />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center border-2 border-[#F7F4EF] font-black">
+                {totalItems}
+              </span>
+            )}
+          </div>
+        </header>
+
+        <div className="px-6 mt-6 space-y-12">
+          {categories.map(cat => (
+            <div key={cat} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <h3 className="text-sm font-black text-[#4E453C] uppercase tracking-[0.2em]">{cat}</h3>
+                <div className="h-[1px] flex-1 bg-[#C7A17A]/20"></div>
+              </div>
+              <div className="grid gap-6">
+                {menuItems.filter(item => item.category === cat).map((item) => (
+                  <div key={item.id} className={`${colors.card} overflow-hidden rounded-[2.5rem] shadow-sm border border-white flex flex-col transform transition-all`}>
+                    <div className="h-48 w-full relative">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black uppercase text-[#8D6D53]">
+                        IDR {item.price/1000}K
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h4 className="font-black text-xl text-[#4E453C] mb-1">{item.name}</h4>
+                      <p className="text-xs text-gray-400 mb-6 leading-relaxed line-clamp-2">{item.description}</p>
+                      <div className="flex justify-end">
+                        {cart[item.id] > 0 ? (
+                          <div className="flex items-center gap-5 bg-gray-50 rounded-full p-1.5 px-5 border border-gray-100">
+                            <button onClick={() => removeFromCart(item.id)} className="p-1 text-gray-400 hover:text-red-500 transition-colors"><Minus size={18}/></button>
+                            <span className="font-black text-sm text-[#4E453C]">{cart[item.id]}</span>
+                            <button onClick={() => addToCart(item.id)} className="p-1 text-[#8D6D53]"><Plus size={18}/></button>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => addToCart(item.id)} 
+                            className={`${colors.button} text-white px-7 py-2.5 rounded-full text-xs font-black shadow-md flex items-center gap-2 active:scale-95 transition-transform`}
+                          >
+                            Tambah <Plus size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {totalItems > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#F7F4EF] via-[#F7F4EF] to-transparent z-30">
+            <button 
+              onClick={() => setStep(3)}
+              className={`w-full py-5 ${colors.button} text-white rounded-[2.5rem] font-black shadow-2xl flex justify-between px-10 items-center ring-8 ring-white/40 transition-all active:scale-95`}
+            >
+              <div className="text-left">
+                <p className="text-[10px] uppercase opacity-60 tracking-wider font-bold">Lanjut Pembayaran</p>
+                <p className="text-lg">Checkout</p>
+              </div>
+              <div className="bg-white/20 px-4 py-2 rounded-2xl text-lg font-black border border-white/10">
+                Rp {totalPrice.toLocaleString('id-ID')}
+              </div>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // 3. Halaman Pembayaran (QRIS Resmi)
+  const PaymentScreen = () => (
+    <div className={`flex flex-col min-h-screen p-6 ${colors.bg}`}>
+      <header className="flex items-center justify-between mb-8">
+        <button onClick={() => setStep(2)} className="p-3 rounded-2xl bg-white shadow-sm text-gray-500 active:scale-90 transition-transform">
+          <ArrowLeft size={20} />
+        </button>
+        <span className="font-black text-[#4E453C] text-xs uppercase tracking-[0.2em]">Metode QRIS</span>
+        <div className="w-10"></div>
+      </header>
+
+      <div className="flex-1 flex flex-col items-center">
+        {/* Kontainer Kartu QRIS */}
+        <div className="w-full bg-white rounded-[3.5rem] shadow-2xl flex flex-col items-center border border-white overflow-hidden">
+          {/* Bagian Atas Logo QRIS */}
+          <div className="w-full bg-white pt-10 pb-4 px-10 flex flex-col items-center border-b border-gray-50">
+            <div className="flex items-center gap-3 w-full justify-between">
+              <div className="flex flex-col">
+                <span className="text-[#1E3A8A] font-black text-3xl italic tracking-tighter leading-none">QRIS</span>
+                <span className="text-[7px] font-bold text-gray-400 mt-1 uppercase tracking-widest leading-none">Quick Response Code Indonesian Standard</span>
+              </div>
+              <div className="bg-[#EBF1FF] px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                <span className="text-[10px] font-black text-[#1E3A8A]">GPN</span>
+              </div>
+            </div>
+            <div className="mt-6 w-full flex justify-between items-end">
+               <div className="flex flex-col">
+                  <p className="text-[9px] font-black text-gray-300 uppercase">Merchant</p>
+                  <p className="text-sm font-black text-[#4E453C]">RESTO BERSAMA</p>
+               </div>
+               <div className="flex flex-col text-right">
+                  <p className="text-[9px] font-black text-gray-300 uppercase">Meja</p>
+                  <p className="text-sm font-black text-[#C7A17A]">{tableNumber}</p>
+               </div>
+            </div>
+          </div>
+          
+          {/* Area Scan QR */}
+          <div className="p-10 bg-white flex flex-col items-center w-full">
+            <div className="relative p-6 bg-white rounded-3xl border-4 border-[#F7F4EF] shadow-inner group">
+              {/* Corner Accents - Sudut Frame */}
+              <div className="absolute -top-1 -left-1 w-10 h-10 border-t-4 border-l-4 border-[#1E3A8A] rounded-tl-xl shadow-[0_0_10px_rgba(30,58,138,0.2)]"></div>
+              <div className="absolute -top-1 -right-1 w-10 h-10 border-t-4 border-r-4 border-[#1E3A8A] rounded-tr-xl"></div>
+              <div className="absolute -bottom-1 -left-1 w-10 h-10 border-b-4 border-l-4 border-[#1E3A8A] rounded-bl-xl"></div>
+              <div className="absolute -bottom-1 -right-1 w-10 h-10 border-b-4 border-r-4 border-[#1E3A8A] rounded-br-xl"></div>
+
+              <div className="w-64 h-64 bg-white flex items-center justify-center overflow-hidden">
+                <QrCode size={230} className="text-[#111]" strokeWidth={1.8} />
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col items-center gap-2">
+               <div className="flex items-center gap-2 text-[#8D6D53] font-black text-xs uppercase tracking-[0.2em] animate-pulse">
+                  <Scan size={18} />
+                  <span>Scan QR Code</span>
+               </div>
+               <p className="text-[10px] text-gray-400 font-medium italic">Simulasi Pembayaran Digital</p>
+            </div>
+          </div>
+
+          {/* Footer Kartu QRIS */}
+          <div className="w-full bg-[#FAF9F6] p-8 text-center border-t border-gray-100">
+            <p className="text-[10px] text-gray-400 font-bold uppercase mb-2">Total Tagihan</p>
+            <h3 className="text-4xl font-black text-[#4E453C] tracking-tighter">
+              Rp {totalPrice.toLocaleString('id-ID')}
+            </h3>
+            <div className="mt-4 flex items-center justify-center gap-1.5 text-[#C7A17A] text-[9px] font-bold uppercase tracking-widest">
+               <Wallet size={12} />
+               <span>Mendukung Semua e-Wallet & M-Banking</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Menunggu */}
+        <div className="mt-10 flex flex-col items-center gap-4 w-full">
+          <div className="flex items-center gap-3 text-[10px] text-blue-800 font-black bg-blue-50 px-6 py-3 rounded-full border border-blue-100">
+            <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-ping" />
+            MENUNGGU PROSES PEMBAYARAN...
+          </div>
+          
+          <button 
+            onClick={() => setStep(4)}
+            className={`w-full py-5 ${colors.button} text-white rounded-[2.5rem] font-black shadow-xl transition-all active:scale-95 text-lg`}
+          >
+            Selesai Membayar
+          </button>
+          
+          <button 
+            onClick={() => setStep(2)}
+            className="text-[10px] font-black text-gray-300 uppercase tracking-widest py-2 hover:text-[#8D6D53] transition-colors"
+          >
+            Kembali & Ubah Menu
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 4. Halaman Rating
+  const RatingScreen = () => (
+    <div className={`flex flex-col items-center justify-center min-h-screen p-8 ${colors.bg}`}>
+      <div className="w-full max-w-sm bg-white p-12 rounded-[4rem] shadow-2xl flex flex-col items-center text-center border border-white">
+        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-8 ring-8 ring-green-100/30">
+          <CheckCircle2 size={56} strokeWidth={1.5} />
+        </div>
+        <h2 className="text-3xl font-black mb-3 text-[#4E453C]">Pembayaran Berhasil!</h2>
+        <p className="text-sm text-gray-400 mb-10 leading-relaxed px-4 font-medium">
+          Pesanan Anda sedang kami siapkan. Bagaimana rasa pengalaman Anda hari ini?
+        </p>
+        
+        {/* Interaksi Rating Bintang */}
+        <div className="flex gap-2.5 mb-10">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button 
+              key={star}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              onClick={() => setRating(star)}
+              className="transition-transform active:scale-125 duration-300 transform"
+            >
+              <Star 
+                size={36} 
+                fill={(hoverRating || rating) >= star ? "#C7A17A" : "transparent"} 
+                color={(hoverRating || rating) >= star ? "#C7A17A" : "#ECECEC"} 
+                strokeWidth={(hoverRating || rating) >= star ? 0 : 2}
+              />
+            </button>
+          ))}
+        </div>
+
+        <textarea 
+          placeholder="Tulis kesan Anda di sini..." 
+          className="w-full p-6 rounded-[2rem] bg-[#F9F8F5] border-none ring-1 ring-gray-100 focus:ring-[#C7A17A] text-sm mb-10 h-32 resize-none shadow-inner text-[#4E453C] outline-none"
+        />
+
+        <button 
+          onClick={() => {
+            setStep(1);
+            setCart({});
+            setTableNumber('');
+            setRating(0);
+          }}
+          className={`w-full py-5 ${colors.button} text-white rounded-[2.5rem] font-black shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all text-lg`}
+        >
+          Kirim Rating <Heart size={20} fill="white" />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="max-w-md mx-auto bg-white shadow-2xl min-h-screen overflow-hidden font-sans select-none antialiased">
+      {step === 1 && <WelcomeScreen />}
+      {step === 2 && <MenuScreen />}
+      {step === 3 && <PaymentScreen />}
+      {step === 4 && <RatingScreen />}
+    </div>
+  );
+};
+
+export default App;
+
+```
